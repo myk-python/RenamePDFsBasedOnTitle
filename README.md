@@ -1,5 +1,5 @@
 # RenamePDFsBasedOnTitle
-Written in Python 3.7.7 for Windows 10
+Written in Python 3.7.7 for Windows 10 <br/>
 Makes use of PyPDF2 and os <br/>
 At present can only be run through and IDE, or Python via command line
 
