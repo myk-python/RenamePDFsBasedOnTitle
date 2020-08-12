@@ -1,0 +1,56 @@
+
+#Importing the module PdfFileReader from custom library PyPDF2
+from PyPDF2 import PdfFileReader
+#Importing the default python library os
+import os
+
+
+
+#This function opens files passed to it.
+#It then does a stepped extraction of the Title field.
+#Then it closes the file to avoid "file in use" errors.
+#Then renames file using os library, based on Title.
+
+
+def info(x):
+    try:    
+        with open(x, 'rb') as file:
+            pdf = PdfFileReader(file, strict=False)        
+            information = pdf.getDocumentInfo()
+            Title = information.title
+           
+            period = '.'
+            replacement = ''
+            TitleAmmended = Title.replace(period, replacement)
+        file.close()
+        os.rename (fullname, (folder + '\\' + TitleAmmended + '.pdf'))    
+        print(TitleAmmended + '''---Has been renamed successfully.''')
+        print('''\n''')
+    except:
+        print('Sorry, there is an issue with the file---' + fullname)
+        print('''\n''')
+        pass
+
+
+#This takes the folder location from the user
+#and then searches for items that are PDFs.
+#Any that are PDFs are then passed to the renaming function above.
+    
+folder = input ('Please input folder path:')
+
+
+for root, dirs, files in os.walk(folder):
+    for files in files:
+        filename = (os.path.splitext(files))
+        basename, extension = (os.path.splitext(files))
+        
+        if extension =='.pdf':
+            compound = (basename + extension)
+            fullname = (folder + '\\' + compound)
+            info (fullname)
+
+
+
+
+
+    
