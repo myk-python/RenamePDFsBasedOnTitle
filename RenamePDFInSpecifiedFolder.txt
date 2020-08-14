@@ -1,56 +1,130 @@
+#Written in Python 3.7.7
 
-#Importing the module PdfFileReader from custom library PyPDF2
+#Importing the module PdfFileReader from PyPDF2 library to extract PDF metadata
+#Importing the os library to navigate folders
+#Importing tkinter library to build the GUI
+#Can be packaged using Pyinstaller and run as stand-alone exe
+
 from PyPDF2 import PdfFileReader
-#Importing the default python library os
 import os
+import tkinter as tk
 
 
-
-#This function opens files passed to it.
-#It then does a stepped extraction of the Title field.
+#This function opens files passed to it (from below)
+#and does a stepped extraction of the Title field.
 #Then it closes the file to avoid "file in use" errors.
 #Then renames file using os library, based on Title.
 
-
 def info(x):
     try:    
+        
         with open(x, 'rb') as file:
             pdf = PdfFileReader(file, strict=False)        
             information = pdf.getDocumentInfo()
-            Title = information.title
-           
+            Title = information.title           
             period = '.'
             replacement = ''
             TitleAmmended = Title.replace(period, replacement)
+        
         file.close()
-        os.rename (fullname, (folder + '\\' + TitleAmmended + '.pdf'))    
-        print(TitleAmmended + '''---Has been renamed successfully.''')
-        print('''\n''')
+        os.rename(fullname, (folder + '\\' + TitleAmmended + '.pdf'))
+        result.insert(tk.END,TitleAmmended + '''\n''' + '''Has been renamed successfully.''' + '''\n''' + '''\n''')
+        result.see('end')
+           
+#Basic error handling will prevent the script hanging if it cannot rename successfully.
+    
     except:
-        print('Sorry, there is an issue with the file---' + fullname)
-        print('''\n''')
+        result.insert(tk.END, 'Sorry, there is an issue with the file:' + '''\n''' + fullname + '''\n''' + '''\n''')
+        result.see('end')
+           
         pass
 
-
-#This takes the folder location from the user
+#This function takes the folder location from the user
 #and then searches for items that are PDFs.
 #Any that are PDFs are then passed to the renaming function above.
-    
-folder = input ('Please input folder path:')
 
-
-for root, dirs, files in os.walk(folder):
-    for files in files:
-        filename = (os.path.splitext(files))
-        basename, extension = (os.path.splitext(files))
+def steppedextraction():
+    global folder
+    folder = directory.get()
+    for root, dirs, files in os.walk(folder):
+        for files in files:
+            global filename, basename, compound, fullname
+            filename = (os.path.splitext(files))
+            basename, extension = (os.path.splitext(files))
         
-        if extension =='.pdf':
-            compound = (basename + extension)
-            fullname = (folder + '\\' + compound)
-            info (fullname)
+            if extension =='.pdf':
+                compound = (basename + extension)
+                fullname = (folder + '\\' + compound)
+                info (fullname)
+
+#Creating the main window parameters
+mainwindow = tk.Tk()
+mainwindow.title ('PDF RENAMING V1.0')
+mainwindow.resizable ('false', 'false')
+
+#Creating custom colour variables based on hex
+
+dimgrey = '#c2c2c2'
+darkgrey = '#616161'
+darkergrey = '#454545'
+resultblue = '#71a3f5'
+
+#Paired label and entry fields form a horizontal line to take the folder path as input
+
+instructions = tk.Label (
+borderwidth = '10',
+text = 'PASTE PATH TO THE RIGHT:',
+font = ('arial','18', 'bold'),
+bg = 'darkgrey',
+fg = 'white',
+).grid (row = '0', column = '0', columnspan = '3', sticky = 'nsew')
+
+
+directory = tk.Entry(mainwindow,
+borderwidth = '10',
+relief = 'sunken',
+font = ('arial', '18', 'normal'),
+justify = 'center',
+fg = 'white',
+bg = dimgrey
+)
+directory.grid (row = '0', column = '3', columnspan = '5', sticky = 'nsew')
+
+#Functional button which calls the search and renaming functions in a nested pattern
+
+renamer= tk.Button(
+borderwidth = '10',
+padx = '0',
+text = 'START RENAME',
+font = ('arial', '18', 'bold'),
+fg = 'white',
+bg = darkgrey,
+command = steppedextraction
+).grid (row = '1', column = '0', columnspan = '8', sticky = 'nsew')
+
+#Displays changes in filename if successful, or error message if unsuccessful
+
+result = tk.Text(wrap = 'word',
+width = '80',
+height = '10',
+padx = '0',
+borderwidth = '10',
+font = ('arial', '18', 'bold'),
+fg = resultblue,
+bg = darkergrey,
+)
+
+#Creates a Y-axis scrollbar and associates it with the results field.
+
+result.grid (row = '2', column = '0', columnspan = '8')
+scroll_y = tk.Scrollbar(mainwindow, orient = "vertical", command = result.yview)
+scroll_y.grid (row = '0', rowspan = '3', column = '9', sticky = 'ns')
+result.configure(yscrollcommand=scroll_y.set)
+
+
+mainwindow.mainloop()
 
 
 
 
-
-    
+  
